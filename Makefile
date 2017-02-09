@@ -21,6 +21,7 @@ lithp-pkg.js: webide
 	$(MAKE) -C node_modules/lithp-pkg files.js EXTRA_PATHS=$(EXTRA_PATHS)
 	cp node_modules/lithp-pkg/files.js .
 	node_modules/.bin/browserify index.js -o lithp-pkg.js
+	cp lithp-pkg.js html/
 
 webide:
 	$(MAKE) -C webide
