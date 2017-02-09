@@ -1,0 +1,13 @@
+% Provides an interface to the WebIDE document. 
+(
+	(import "./webide/html-toolkit")
+	(import "./webide/jquery-toolkit")
+
+	(jqueryOnLoad (scope # :: (
+		(print "Secondary jQuery init")
+		(var Editor (jQuery "#editor"))
+		(print "Editor: " Editor)
+		%(member-call Divs remove)
+		(print "Editor divs: " (jQuery "div" Editor))
+	)))
+)

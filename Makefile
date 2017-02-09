@@ -4,9 +4,13 @@ GENFILES=./genfiles.sh
 RUNFLAGS=
 EXTRA_PATHS=../../webide
 
-.PHONY: webide
-default: links webide lithp-pkg.js
+.PHONY: webide lithp-pkg.js pre
+default: pre links webide lithp-pkg.js
 all: default
+
+
+pre:
+	rm -f node_modules/lithp-pkg/files.js
 
 links:
 	if [ ! -e "run" ]; then \
@@ -15,7 +19,6 @@ links:
 
 lithp-pkg.js: webide
 	$(MAKE) -C node_modules/lithp-pkg files.js EXTRA_PATHS=$(EXTRA_PATHS)
-	cp node_modules/lithp-pkg/index.js .
 	cp node_modules/lithp-pkg/files.js .
 	node_modules/.bin/browserify index.js -o lithp-pkg.js
 
@@ -24,6 +27,5 @@ webide:
 
 clean:
 	rm -f lithp-pkg.js
-	rm -f index.js
 	$(MAKE) -C node_modules/lithp-pkg clean
 	$(MAKE) -C webide clean

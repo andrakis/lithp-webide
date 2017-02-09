@@ -1,0 +1,83 @@
+% Provides an interface to the jQuery object.
+(
+	(print "JQuery behaviour module initializing")
+	(import lists)
+	(import class)
+
+	(var JQueryJSObj (atom nil))
+	(var JQueryOnLoadCallbacks (list))
+
+	(def onJQuery (scope #JQ :: (
+		(set JQueryJSObj (get JQ))
+		(print "JQuery initialized")
+		(map JQueryOnLoadCallbacks #CB :: (
+			(call CB)
+		))
+	)))
+
+	(def jqueryOnLoad (scope #Callback :: (
+		(set JQueryOnLoadCallbacks (++ JQueryOnLoadCallbacks (list Callback)))
+		(atom ok)
+	)))
+
+	(export-global onJQuery/1 jqueryOnLoad/1)
+
+	(def jquery-fn (scope # :: (
+		(dict-get (dict-get JQueryJSObj fn) init)
+	)))
+
+	(def jquery-init/* #Args :: (
+		(js-apply (jquery-fn) (jquery-fn) Args)
+	))
+
+	(def jQueryClass #JQueryResult :: (
+		(new JQueryClass JQueryResult)
+	))
+
+	(def jQuery/1 #Selector :: (
+		(jQueryClass (jquery-init Selector))
+	))
+	(def jQuery/2 #Selector,Context :: (
+		(jQueryClass (jquery-init Selector Context))
+	))
+	(def jQuery/3 #Selector,Context,Root :: (
+		(jQueryClass (jquery-init Selector Context Root)a)
+	))
+
+	(export-global jQuery/1 jQuery/2 jQuery/3)
+
+	% The JQuery class
+	(var JQueryClass (class 'JQueryClass'
+		(tuple (class-init) #Self,From :: (
+			(member-set Self target From)
+		))
+
+		% Public API
+		(tuple getValue #Self :: (
+			(member-call Self call val (list))
+		))
+		(tuple remove #Self :: (
+			(member-call Self call remove (list))
+		))
+		(tuple setValue #Self,Value :: (
+			(member-call Self call val (list Value))
+		))
+
+		% Internal use
+		(tuple call #Self,Member,Args :: (
+			(new JQueryClass (member-call Self invoke Member Args))
+		))
+		(tuple invoke #Self,Member,Args :: (
+			(js-apply (member-get Self target) (member-call Self getTargetMember Member) Args)
+		))
+		(tuple invoke-immediate #Self,Search :: (
+			(invoke (member-get Self target) (list Search))
+		))
+		(tuple getTarget #Self :: (
+			(member-get Self target)
+		))
+		(tuple getTargetMember #Self,Member :: (
+			(dict-get (member-call Self getTarget) Member)
+		))
+	))
+)
