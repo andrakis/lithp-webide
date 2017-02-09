@@ -27,7 +27,7 @@
 							fakeConsole.logStderr.apply(fakeConsole, arguments); },
 	};
 
-	var instance = new Lithp.Lithp();
+	var instance = window.lithpInstance;
 
 	window.runCode = function(code) {
 		var debugMode = document.getElementById("debugMode").checked;
