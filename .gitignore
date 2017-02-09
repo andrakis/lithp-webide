@@ -1,0 +1,8 @@
+files.js
+lithp-pkg.js
+node_modules/
+*.*swp
+*.*swo
+*.ast
+*.json
+run
