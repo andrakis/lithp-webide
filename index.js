@@ -20,7 +20,7 @@ try {
 global._lithp.browserify = true;
 global._lithp.fileCache = files;
 
-window.Lithp.set_debug_flag(true);
+//window.Lithp.set_debug_flag(true);
 
 var instance = new lithp.Lithp();
 window.lithpInstance = instance;

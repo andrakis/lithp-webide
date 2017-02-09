@@ -5,9 +5,9 @@
 
 	(jqueryOnLoad (scope # :: (
 		(print "Secondary jQuery init")
-		(var Editor (jQuery "#editor"))
-		(print "Editor: " Editor)
+		(var Divs (jQuery "div"))
+		(print "Divs: " Divs)
 		%(member-call Divs remove)
-		(print "Editor divs: " (jQuery "div" Editor))
+		%(print "Editor divs: " (jQuery "div" Editor))
 	)))
 )
