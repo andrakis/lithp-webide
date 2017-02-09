@@ -27,9 +27,9 @@
 							fakeConsole.logStderr.apply(fakeConsole, arguments); },
 	};
 
-	var instance = window.lithpInstance;
-
 	window.runCode = function(code) {
+		var instance = window.lithpInstance;
+
 		var debugMode = document.getElementById("debugMode").checked;
 		var parserDebug=document.getElementById("parserDebugMode").checked;
 		var clearOnRun= document.getElementById("clearOnRun").checked;
