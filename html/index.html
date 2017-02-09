@@ -105,9 +105,9 @@
 			var editor = ace.edit("editor");
 			editor.setTheme("ace/theme/idle_fingers");
 			editor.session.setMode("ace/mode/lithp");
-			var codeMatch = location.search.match(/^\?code=(.*?)(?:(&|$))/);
 			if(codeMatch) {
-				editor.setValue(Base64.decode(codeMatch[1]));
+				// -1 moves cursor to start
+				editor.setValue(Base64.decode(codeMatch[1]), -1);
 			}
 			function updatePermalink () {
 				var code64 = Base64.encode(editor.getValue());
