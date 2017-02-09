@@ -1,0 +1,27 @@
+% Lithp WebIDE support functions
+% Interfaces with the JavaScript editor to listen for events and run actions.
+(
+
+	(var Handlers (dict))
+	(var Objects (dict))
+
+	(def page-get #Page,Element :: (
+		(dict-get Page Element)
+	))
+
+	(def get-code #Page :: (
+		(call Page getCode)
+	))
+
+	(dict-set Objects onReady #Page :: (
+		(dict-set Objects aceEditor (page-get Page aceEditor))
+		(dict-set Objects runCode (page-get Page buttonRunCode))
+		(dict-set Handlers runCode (js-bridge #Page :: (
+			(try (
+				(print "Result: " (eval (get-code)))
+			) (catch #E :: (
+				(print "Failure: " E)
+			)))
+		)))
+	))
+)
