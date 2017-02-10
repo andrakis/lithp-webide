@@ -25,6 +25,9 @@ global._lithp.fileCache = files;
 var instance = new lithp.Lithp();
 window.lithpInstance = instance;
 var code = files["webide/webide.ast"];
+if(code === undefined)
+	console.log("Error: webide not found");
+
 var ideParsed = lithp.Parser(code, {ast: true, finalize: true});
 instance.setupDefinitions(ideParsed, "webide.ast")
 instance.Define(ideParsed, "__AST__", lithp.Types.Atom('true'));

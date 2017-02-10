@@ -2,10 +2,10 @@ LIBS=
 RUN=node_modules/lithp/run
 GENFILES=./genfiles.sh
 RUNFLAGS=
-EXTRA_PATHS=../../webide
+EXTRA_PATHS="../../modules ../../webide"
 
-.PHONY: webide lithp-pkg.js pre
-default: pre links webide lithp-pkg.js
+.PHONY: webide modules lithp-pkg.js pre
+default: pre links modules lithp-pkg.js
 all: default
 
 
@@ -17,11 +17,14 @@ links:
 		ln -s node_modules/lithp/run.js run; \
 	fi
 
-lithp-pkg.js: webide
+lithp-pkg.js: modules webide
 	$(MAKE) -C node_modules/lithp-pkg files.js EXTRA_PATHS=$(EXTRA_PATHS)
 	cp node_modules/lithp-pkg/files.js .
 	node_modules/.bin/browserify index.js -o lithp-pkg.js
 	cp lithp-pkg.js html/
+
+modules:
+	$(MAKE) -C modules
 
 webide:
 	$(MAKE) -C webide
@@ -29,4 +32,5 @@ webide:
 clean:
 	rm -f lithp-pkg.js
 	$(MAKE) -C node_modules/lithp-pkg clean
+	$(MAKE) -C modules clean
 	$(MAKE) -C webide clean

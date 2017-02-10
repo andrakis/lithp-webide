@@ -1,8 +1,8 @@
 % Provides an interface to the WebIDE document.
 (
 	(import class)
-	(import "./webide/html-toolkit")
-	(import "./webide/jquery-toolkit")
+	(import "html-toolkit")
+	(import "jquery-toolkit")
 
 	(jqueryOnLoad (scope # :: (
 		(print "Secondary jQuery init")
