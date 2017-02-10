@@ -47,5 +47,12 @@
 		} catch (e) {
 			console.log(e.stack);
 		}
+		if(instance.Defined(result, "JQUERY_TOOLKIT")) {
+			if(window.jQuery) {
+				console.log("Invoking jQuery behaviour");
+				window.jQuery.noConflict();
+				instance.Invoke(result, "onJQuery/1", [window.jQuery])
+			}
+		}
 	}
 })();

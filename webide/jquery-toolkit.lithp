@@ -4,6 +4,8 @@
 	(import lists)
 	(import class)
 
+	(define 'JQUERY_TOOLKIT' true)
+
 	(var JQueryJSObj (atom nil))
 	(var JQueryOnLoadCallbacks (list))
 
@@ -27,21 +29,29 @@
 	)))
 
 	(def jquery-init/* #Args :: (
-		(js-apply (jquery-fn) (jquery-fn) Args)
+		%(js-apply (jquery-fn) (jquery-fn) Args)
+		%(apply (jquery-fn) Args)
+		(apply invoke (++ (list (dict-get JQueryJSObj fn) init) Args))
 	))
 
 	(def jQueryClass #JQueryResult :: (
 		(new JQueryClass JQueryResult)
 	))
 
+	(def unclass #JQ :: (
+		(if (== dict (typeof JQ)) (
+			(member-call JQ getTarget)
+		) (else ((JQ))))
+	))
+
 	(def jQuery/1 #Selector :: (
 		(jQueryClass (jquery-init Selector))
 	))
 	(def jQuery/2 #Selector,Context :: (
-		(jQueryClass (jquery-init Selector Context))
+		(jQueryClass (jquery-init Selector (unclass Context)))
 	))
 	(def jQuery/3 #Selector,Context,Root :: (
-		(jQueryClass (jquery-init Selector Context Root)a)
+		(jQueryClass (jquery-init Selector (unclass Context) Root))
 	))
 
 	(export-global jQuery/1 jQuery/2 jQuery/3)
@@ -53,6 +63,12 @@
 		))
 
 		% Public API
+		(tuple setCss #Self,Css :: (
+			(member-call Self call css (list Css))
+		))
+		(tuple getCss #Self :: (
+			(member-call Self call css (list))
+		))
 		(tuple getValue #Self :: (
 			(member-call Self call val (list))
 		))
