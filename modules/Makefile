@@ -1,6 +1,6 @@
 LIBS=
 RUN=../run
-RUNFLAGS=
+RUNFLAGS=-cc
 
 AST = $(patsubst %.lithp, %.ast, $(wildcard *.lithp))
 
