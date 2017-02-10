@@ -7,7 +7,6 @@
 		%(print "Document: " (inspect Doc))
 		(set Document (get Doc))
 		%(print "Editor: " (inspect (getElementById "editor")))
-		(print "Document ready")
 	)))
 
 	(def getElementById (scope #Id :: (
