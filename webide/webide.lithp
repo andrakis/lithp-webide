@@ -1,17 +1,17 @@
 % Provides an interface to the WebIDE document.
 (
 	(import class)
-	(import "html-toolkit")
-	(import "jquery-toolkit")
-
-	(jqueryOnLoad (scope # :: (
-		(print "Secondary jQuery init")
-		(var Body (jQuery "body"))
-		(print "Body: " Body)
-		(var Anchors (jQuery "a" Body))
-		(print "Anchors:" Anchors)
-		(member-call Anchors setCss (dict (tuple color "red")))
-		(var B (jQuery "<b>TEST</b>"))
-		(member-call Body append B)
-	)))
+%	(import "html-toolkit")
+%	(import "jquery-toolkit")
+%
+%	(jqueryOnLoad (scope # :: (
+%		(print "Secondary jQuery init")
+%		(var Body (jQuery "body"))
+%		(print "Body: " Body)
+%		(var Anchors (jQuery "a" Body))
+%		(print "Anchors:" Anchors)
+%		(member-call Anchors setCss (dict (tuple color "red")))
+%		(var B (jQuery "<b>TEST</b>"))
+%		(member-call Body append B)
+%	)))
 )
