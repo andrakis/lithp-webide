@@ -35,8 +35,8 @@ instance.Define(ideParsed, "RUNTIME", "browser");
 instance.run(ideParsed);
 
 window.onload = function() {
-	console.log("Invoking onReady behaviour");
 	if(instance.Defined(ideParsed, "HTML_TOOLKIT") == lithp.Types.Atom('true')) {
+		console.log("Invoking onReady behaviour");
 		try {
 			instance.Invoke(ideParsed, "onReady/1", [document]);
 		} catch (e) {
