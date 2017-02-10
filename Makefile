@@ -13,7 +13,7 @@ pre:
 	rm -f node_modules/lithp-pkg/files.js
 
 links:
-	if [ ! -e "run" ]; then \
+	if [ ! -L "run" ]; then \
 		ln -s node_modules/lithp/run.js run; \
 	fi
 

@@ -33,10 +33,20 @@ instance.run(ideParsed);
 
 window.onload = function() {
 	console.log("Invoking onReady behaviour");
-	instance.Invoke(ideParsed, "onReady/1", [document]);
-	if(window.jQuery) {
+	if(instance.Defined(ideParsed, "HTML_TOOLKIT") == lithp.Types.Atom('true')) {
+		try {
+			instance.Invoke(ideParsed, "onReady/1", [document]);
+		} catch (e) {
+			console.log(e.stack);
+		}
+	}
+	if(window.jQuery && instance.Defined(ideParsed, "JQUERY_TOOLKIT") == lithp.Types.Atom('true')) {
 		console.log("Invoking jQuery behaviour");
 		window.jQuery.noConflict();
-		instance.Invoke(ideParsed, "onJQuery/1", [window.jQuery])
+		try {
+			instance.Invoke(ideParsed, "onJQuery/1", [window.jQuery])
+		} catch (e) {
+			console.log(e.stack);
+		}
 	}
 };

@@ -1,6 +1,7 @@
 % Provides a basic interface to HTML objects in the document.
 % You must invoke onReady/1 with the "body" element.
 (
+	(define 'HTML_TOOLKIT' true)
 	(var Document (atom nil))
 	(def onReady (scope #Doc :: (
 		%(print "Document: " (inspect Doc))

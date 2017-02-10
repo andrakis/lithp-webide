@@ -1,6 +1,5 @@
 % Provides an interface to the jQuery object.
 (
-	(print "JQuery behaviour module initializing")
 	(import lists)
 	(import class)
 
@@ -9,14 +8,16 @@
 	(var JQueryJSObj (atom nil))
 	(var JQueryOnLoadCallbacks (list))
 
+	% Called by the JavaScript editor when code is run
 	(def onJQuery (scope #JQ :: (
 		(set JQueryJSObj (get JQ))
-		(print "JQuery initialized")
 		(map JQueryOnLoadCallbacks #CB :: (
 			(call CB)
 		))
 	)))
 
+	% Used to add a callback when the above function is called.
+	% Essentially, this is your $(function() { }) callback.
 	(def jqueryOnLoad (scope #Callback :: (
 		(set JQueryOnLoadCallbacks (++ JQueryOnLoadCallbacks (list Callback)))
 		(atom ok)
@@ -24,26 +25,7 @@
 
 	(export-global onJQuery/1 jqueryOnLoad/1)
 
-	(def jquery-fn (scope # :: (
-		(dict-get (dict-get JQueryJSObj fn) init)
-	)))
-
-	(def jquery-init/* #Args :: (
-		%(js-apply (jquery-fn) (jquery-fn) Args)
-		%(apply (jquery-fn) Args)
-		(apply invoke (++ (list (dict-get JQueryJSObj fn) init) Args))
-	))
-
-	(def jQueryClass #JQueryResult :: (
-		(new JQueryClass JQueryResult)
-	))
-
-	(def unclass #JQ :: (
-		(if (== dict (typeof JQ)) (
-			(member-call JQ getTarget)
-		) (else ((JQ))))
-	))
-
+	% Public API
 	(def jQuery/1 #Selector :: (
 		(jQueryClass (jquery-init Selector))
 	))
@@ -56,6 +38,22 @@
 
 	(export-global jQuery/1 jQuery/2 jQuery/3)
 
+	% Internal API
+	(def jquery-init/* #Args :: (
+		(js-invoke JQueryJSObj Args)
+	))
+
+	(def jQueryClass #JQueryResult :: (
+		(new JQueryClass JQueryResult)
+	))
+
+	% Grabs the jQuery object from the class, if it is a class.
+	(def unclass #JQ :: (
+		(if (== dict (typeof JQ)) (
+			(member-call JQ getTarget)
+		) (else ((JQ))))
+	))
+
 	% The JQuery class
 	(var JQueryClass (class 'JQueryClass'
 		(tuple (class-init) #Self,From :: (
@@ -63,8 +61,8 @@
 		))
 
 		% Public API
-		(tuple setCss #Self,Css :: (
-			(member-call Self call css (list Css))
+		(tuple append #Self,Obj :: (
+		    (member-call Self call append (list (unclass Obj)))
 		))
 		(tuple getCss #Self :: (
 			(member-call Self call css (list))
@@ -74,6 +72,9 @@
 		))
 		(tuple remove #Self :: (
 			(member-call Self call remove (list))
+		))
+		(tuple setCss #Self,Css :: (
+			(member-call Self call css (list Css))
 		))
 		(tuple setValue #Self,Value :: (
 			(member-call Self call val (list Value))

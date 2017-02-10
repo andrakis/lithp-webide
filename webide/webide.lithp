@@ -1,4 +1,4 @@
-% Provides an interface to the WebIDE document. 
+% Provides an interface to the WebIDE document.
 (
 	(import class)
 	(import "./webide/html-toolkit")
@@ -6,18 +6,12 @@
 
 	(jqueryOnLoad (scope # :: (
 		(print "Secondary jQuery init")
-		% Disable for now
 		(var Body (jQuery "body"))
-		(print "Type: " (typeof Body))
-		(print "SubType: " (member-call Body getTarget))
-		(print "of: " (typeof (member-call Body getTarget)))
-		(var Divs (jQuery "div" Body))
-		% (print "Divs: " Divs)
-		%(member-call Divs remove)
-		(var Editor (jQuery "#editor"))
-		(print "Editor divs: " (jQuery "div" Editor))
-		(var New (jQuery "<div>"))
-		(print "New: " New)
-
+		(print "Body: " Body)
+		(var Anchors (jQuery "a" Body))
+		(print "Anchors:" Anchors)
+		(member-call Anchors setCss (dict (tuple color "red")))
+		(var B (jQuery "<b>TEST</b>"))
+		(member-call Body append B)
 	)))
 )
