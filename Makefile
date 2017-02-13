@@ -4,7 +4,7 @@ GENFILES=./genfiles.sh
 RUNFLAGS=
 EXTRA_PATHS="../../modules ../../webide"
 
-.PHONY: webide modules lithp-pkg.js pre
+.PHONY: webide modules lithp-pkg.js pre clean
 default: pre links modules lithp-pkg.js
 all: default
 

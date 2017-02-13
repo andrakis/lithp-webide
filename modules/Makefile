@@ -6,6 +6,7 @@ AST = $(patsubst %.lithp, %.ast, $(wildcard *.lithp))
 
 default: $(AST) final $(SUBDIRS)
 all: default
+.PHONY: clean
 
 FINAL=
 
