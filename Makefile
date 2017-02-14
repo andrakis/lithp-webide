@@ -3,7 +3,7 @@ RUN=node_modules/lithp/run
 GENFILES=./genfiles.sh
 RUNFLAGS=-cc
 EXTRA_PATHS="../../modules ../../webide"
-BROWSERIFY_OPTS=-r browserify-bignum -r buffer-browserify
+BROWSERIFY_OPTS=
 
 .PHONY: webide modules lithp-pkg.js pre clean
 default: pre modules lithp-pkg.js
