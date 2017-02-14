@@ -1,3 +1,6 @@
+if(typeof window === 'undefined')
+	window = {};
+
 if(window.global != global) {
 	window.global = window;
 	global = window;
@@ -17,9 +20,6 @@ try {
 	return;
 }
 
-global._lithp.browserify = true;
-global._lithp.fileCache = files;
-
 //window.Lithp.set_debug_flag(true);
 
 var instance = new lithp.Lithp();
@@ -27,6 +27,11 @@ window.lithpInstance = instance;
 var code = files["webide/webide.ast"];
 if(code === undefined)
 	console.log("Error: webide not found");
+
+if(global._lithp === undefined)
+	global._lithp = {};
+global._lithp.browserify = true;
+global._lithp.fileCache = files;
 
 var ideParsed = lithp.Parser(code, {ast: true, finalize: true});
 instance.setupDefinitions(ideParsed, "webide.ast")
