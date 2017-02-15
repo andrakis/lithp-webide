@@ -5,12 +5,17 @@ RUNFLAGS=-cc
 EXTRA_PATHS="../../modules ../../webide"
 BROWSERIFY_OPTS=
 
-.PHONY: webide modules lithp-pkg.js pre clean
-default: pre modules lithp-pkg.js
+.PHONY: webide modules lithp-pkg.js pre links clean
+default: pre links modules lithp-pkg.js
 all: default
 
 pre:
 	rm -f node_modules/lithp-pkg/files.js
+
+links:
+	if [ ! -L "run" ]; then \
+		ln -s node_modules/lithp/run.js run; \
+	fi
 
 lithp-pkg.js: modules webide
 	$(MAKE) -C node_modules/lithp-pkg files.js EXTRA_PATHS=$(EXTRA_PATHS)
