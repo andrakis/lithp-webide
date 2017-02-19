@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta content="en-us" http-equiv="Content-Language" />
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<title>This is the file explorer</title>
+<script src="frame-shared.js" type="text/javascript"></script>
+<script src="jquery-3.1.1.js" type="text/javascript"></script>
+<script src="jstree/jstree.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+	$(function () {
+		// data-jstree='{ "opened" : true }'
+		$('#filetree').jstree();
+		$('#filetree').jstree().open_all();
+	});
+</script>
+<link href="jstree/themes/default/style.min.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body style="background-color:darkgray;">
+
+<div id="filetree">
+	<ul>
+		<li>Lithp Source Code
+			<ul>
+				<li>modules
+					<ul>
+						<li>lists.lithp</li>
+						<li>random.lithp</li>
+					</ul>
+				</li>
+				<li>samples
+					<ul>
+						<li>fib.lithp</li>
+					</ul>
+				</li>
+				<li>repl.lithp</li>
+			</ul>
+		</li>
+		<li>
+			Samples
+			<ul>
+				<li>fib.lithp</li>
+			</ul>
+		</li>
+		<li>Your files
+			<ul>
+				<li>config
+					<ul>
+						<li>editor.json</li>
+					</ul>
+				</li>
+				<li>unnamed.lithp</li>
+			</ul>
+		</li>
+	</ul>
+</div>
+
+</body>
+
+</html>

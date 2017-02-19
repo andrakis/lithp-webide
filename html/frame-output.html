@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+	<head>
+		<meta content="en-us" http-equiv="Content-Language" />
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+		<title>This is the output</title>
+		<style type="text/css">
+			body {
+				margin: 0;
+			}
+			#target {
+				color: white;
+				background-color: black;
+				font-family: monospace;
+				height: 100%;
+				width: 100%;
+				position:absolute;
+				overflow:auto;
+				margin: 0;
+			}
+		</style>
+		<script src="types.js" type="text/javascript"></script>
+		<script src="frame-shared.js" type="text/javascript"></script>
+	</head>
+	<body>
+		<pre id="target"></pre>
+		<script type="text/javascript">
+			console.log("  output loading");
+
+			var lastAppend = 0;
+			var cache = "";
+			var appendTimeout;
+
+			function runEditorCode () {
+				var code = editor.getValue();
+				runCode(code);
+			}
+
+			function clearConsole () {
+				var target = document.getElementById("target");
+				target.innerText = "";
+				target.scrollTop = target.scrollHeight;
+				cache = "";
+			}
+
+			function appendConsole (content) {
+				cache += content;
+
+				var now = new Date().getTime();
+				if(now - lastAppend > 100) {
+					flushCache();
+					lastAppend = now;
+					if(appendTimeout) {
+						clearTimeout(appendTimeout);
+						appendTimeout = undefined;
+					}
+				} else {
+					if(!appendTimeout) {
+						appendTimeout = setTimeout(checkCache, 100);
+					}
+				}
+			}
+
+			function flushCache () {
+				var target = document.getElementById("target");
+				target.innerText += cache;
+				target.scrollTop = target.scrollHeight;
+				cache = "";
+			}
+
+			function checkCache () {
+				appendTimeout = undefined;
+				flushCache();
+			}
+
+			setTimeout(flushCache, 0);
+			
+			window.onmessage = function(msg) {
+				//console.log("    output got message: ", msg);
+				var data = msg.data;
+				switch(data.type) {
+					case msgOutputConsole:
+						appendConsole(data.content);
+						break;
+					case msgOutputFakeConsole:
+						switch(data.stream) {
+							case "stdout":
+								appendConsole(data.content);
+								break;
+							case "stderr":
+								appendConsole("STDERR: " + data.content);
+								break;
+							default:
+								appendConsole(data.stream.toUpperCase() + ": " + data.content);
+								break;
+						}
+						break;
+					case msgFlushCache:
+						flushCache();
+						break;
+					case msgClearConsole:
+						clearConsole();
+						break;
+					default:
+						console.log("(output) unknown msg type: " + data.type);
+						break;
+				}
+			};
+			console.log("    onmessage handler registered");
+			window.parent.postMessage(MsgFrameReady("output"), "*");
+			console.log("  done");
+		</script>
+	</body>
+</html>

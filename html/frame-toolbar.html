@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+	<head>
+		<meta content="en-us" http-equiv="Content-Language" />
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+		<title>Toolbar</title>
+		<style type="text/css">
+			#toolbox { height: 1.3em; }
+			#toolbox:after { clear: both; }
+			#toolbox .item { float: left; margin-right: 1em; }
+			#target {
+				margin-top: 0;
+				clear: both;
+				color: white;
+				background-color: black;
+				font-family: monospace;
+				min-height: 10em;
+				max-height: 15em;
+				overflow: auto;
+				cursor: text;
+			}
+		</style>
+		<script src="types.js" type="text/javascript"></script>
+		<script src="frame-shared.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			console.log("  toolbar loading");
+			console.log("    window parent: ", window.parent);
+			
+			window.onmessage = function(msg) {
+				var data = msg.data;
+				switch(data.type) {
+					case msgGetToolbarSettings:
+						syncSettings();
+						break;
+					case msgGotUpdatePermalink:
+						codePermalink.href = "index.html?code=" + data.link;
+						break;
+					default:
+						console.log("(toolbar) unknown msg: " + data.type);
+						break;
+				}
+			};
+			
+			window.parent.postMessage(MsgFrameReady("toolbar"), "*");
+			
+			function runEditorCode () {
+				window.parent.postMessage(MsgRunCode(), "*");
+			}
+			
+			function syncSettings () {
+				var debugMode = document.getElementById("debugMode").checked;
+				var parserDebug=document.getElementById("parserDebugMode").checked;
+				var clearOnRun= document.getElementById("clearOnRun").checked;
+				window.parent.postMessage(MsgGotToolbarSettings({debugMode: debugMode, parserDebug: parserDebug, clearOnRun: clearOnRun}), "*");
+			}
+		</script>
+	</head>
+
+	<body style="background-color:darkgray;">
+
+		<div id="toolbox">
+			<form>
+				<label class="item">
+					<input type="checkbox" id="debugMode" onclick="syncSettings();" />Debug Mode
+				</label>
+				<label class="item">
+					<input type="checkbox" id="parserDebugMode" onclick="syncSettings();" />Parser Debug Mode
+				</label>
+				<label class="item">
+					<input type="checkbox" checked="checked" id="clearOnRun" onclick="syncSettings();" />Clear on Run
+				</label>
+				<input type="button" class"item" onclick="runEditorCode()" value="Run code" />
+				<label class="item">
+					<a href="index.html?" id="codePermalink" target="_parent">Code Permalink</a>
+				</label>
+				<script type="text/javascript">
+					var codePermalink = document.getElementById("codePermalink");
+					codePermalink.onmouseenter = function() {
+						window.parent.postMessage(MsgStartUpdatePermalink(), "*");
+					}
+				</script>
+			</form>
+		</div>
+
+
+	</body>
+
+</html>

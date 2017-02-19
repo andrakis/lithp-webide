@@ -1,0 +1,255 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html>
+
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+		<title>Lithp Web IDE</title>
+		<script src="jquery-3.1.1.js" type="text/javascript"></script>
+		<script src="base64.js" type="text/javascript"></script>
+		<script src="types.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			var oldConsole = console;
+			window.fakeConsole = {
+				stdout: "",
+				stderr: "",
+				logStdout: function() {
+					var out = Array.prototype.join.call(arguments, ' ');
+					if(out.length > 0) {
+						if(out.slice(-1) != "\n")
+							out += "\n";
+						fakeConsole.stdout += out;
+					}
+					if(fakeConsole.onStdout && fakeConsole.stdout.length > 0) {
+						fakeConsole.onStdout(fakeConsole.stdout);
+						fakeConsole.stdout = "";
+					}
+				},
+				logStderr: function() {
+					var out = Array.prototype.join.call(arguments, ' ');
+					if(out.length > 0) {
+						out = "STDERR: " + out;
+						if(out.slice(-1) != "\n")
+							out += "\n";
+						fakeConsole.stderr += out;
+					}
+					if(fakeConsole.onStderr && fakeConsole.stderr.length > 0) {
+						fakeConsole.onStderr(fakeConsole.stderr);
+						fakeConsole.stderr = "";
+					}
+				},
+				onStdout: null,
+				onStderr: null,
+				flush: function() {
+					window.fakeConsole.logStdout("");
+					window.fakeConsole.logStderr("");
+				}
+			};
+			window.console = {
+				oldConsoleStdout: true,
+				oldConsoleStderr: true,
+				log: function() {
+					if(window.console.oldConsoleStdout) {
+						oldConsole.log.apply(oldConsole , arguments);
+					}
+					fakeConsole.logStdout.apply(fakeConsole, arguments);
+				},
+				error: function() {
+					if(window.console.oldConsoleStderr) {
+						oldConsole.error.apply(oldConsole , arguments);
+					}
+					fakeConsole.logStderr.apply(fakeConsole, arguments);
+				},
+			};
+		</script>
+		<script type="text/javascript">
+			console.log("Web IDE loading");
+			var toolbarSettings = {};
+			window.onmessage = function(msg) {
+				console.log("toplevel received: ", msg.data.type);
+				var data = msg.data;
+				switch(data.type) {
+					case msgFrameReady:
+						frameReady(data);
+						break;
+					case msgRunCode:
+						window.frames["frame-editor"].postMessage(MsgGetEditorCode(), "*");
+						break;
+					case msgGotEditorCode:
+						runCode(data.code);
+						break;
+					case msgGotToolbarSettings:
+						toolbarSettings = data.settings;
+						break;
+					case msgOutputFakeConsole:
+						switch(data.stream) {
+							case 'stdout':
+								fakeConsole.logStdout(data.content);
+								break;
+							case 'stderr':
+								fakeConsole.logStderr(data.content);
+								break;
+							default:
+								console.log("unknown stream: " + data.stream);
+								break;
+						}
+						break;
+					case msgStartUpdatePermalink:
+						window.frames["frame-editor"].postMessage(MsgStartUpdatePermalink(), "*");
+						break;
+					case msgGotUpdatePermalink:
+						window.frames["frame-toolbar"].postMessage(data, "*");
+						break;
+					default:
+						console.log("unknown message: " + data.type);
+						break;
+				}
+			}
+
+			var stdout_buffer = "", stdout_last = 0, stdout_timer = undefined;
+			
+			function flushBufferStdout () {
+				if(stdout_buffer.length > 0) {
+					window.frames["frame-output"].postMessage(MsgOutputFakeConsole("stdout", stdout_buffer), "*");
+					stdout_buffer = "";
+					stdout_last = Date.now();
+				}
+				if(stdout_timer) {
+					clearTimeout(stdout_timer);
+					stdout_timer = undefined;
+				}
+			}
+			
+			function scheduleFlushBuffers () {
+				scheduleFlushBufferStdout();
+			}
+			
+			function scheduleFlushBufferStdout () {
+				if(stdout_buffer.length == 0)
+					return;
+		
+				var now = Date.now();
+				if(now - stdout_last > 100) {
+					flushBufferStdout();
+				} else {
+					stdout_timer = setTimeout(scheduleFlushBufferStdout, 200);
+				}
+			}
+			
+			function frameReady (data) {
+				switch(data.name) {
+					case "output":
+						window.console.oldConsoleStderr = false;
+						window.frames["frame-output"].postMessage(MsgOutputConsole("Output console registered\n"), "*");
+						fakeConsole.onStdout = function(content) {
+							if(content.length > 0) {
+								if(content.slice(-1) != "\n")
+									content += "\n";
+								stdout_buffer += content;
+								scheduleFlushBuffers();
+							}
+						}
+						fakeConsole.onStderr = function(content) {
+							if(content.length > 0) {
+								if(content.slice(-1) != "\n")
+									content += "\n";
+								stdout_buffer += content;
+								scheduleFlushBuffers();
+							}
+						}
+						fakeConsole.flush();
+						flushBufferStdout();
+						console.log("Output console activated");
+						break;
+					case "toolbar":
+						window.frames["frame-toolbar"].postMessage(MsgGetToolbarSettings(), "*");
+						break;
+					case "editor":
+						var codeMatch = location.search.match(/^\?code=(.*?)(?:(&|$))/);
+						if(codeMatch) {
+							var code = Base64.decode(codeMatch[1]);
+							window.frames["frame-editor"].postMessage(MsgSetEditorCode(code), "*");
+						}
+						window.frames["frame-editor"].postMessage(MsgStartUpdatePermalink(), "*");
+						break;
+					default:
+						console.log("Unknown frameReady: " + data.name);
+						break;
+				}
+			}
+			
+			function clearConsole() {
+				window.frames["frame-output"].postMessage(MsgClearConsole(), "*");
+			}
+			
+			function flushCache() {
+				flushBufferStdout();
+				window.frames["frame-output"].postMessage(MsgFlushCache(), "*");
+			}
+
+			function runCode (code) {
+				var debugMode = toolbarSettings.debugMode;
+				var parserDebug=toolbarSettings.parserDebug;
+				var clearOnRun= toolbarSettings.clearOnRun;
+
+				if(clearOnRun) {
+					clearConsole();
+					setTimeout(runCodeImmediate, 2, code, debugMode, parserDebug);
+				} else {
+					runCodeImmediate(code, debugMode, parserDebug);
+				}
+			}
+			
+			function runCodeImmediate(code, debugMode, parserDebug) {
+				var instance = window.lithpInstance;
+				Lithp.set_debug_flag(debugMode);
+				global._lithp.set_parser_debug(parserDebug);
+				var result = Lithp.Parser(code, {finalize: true, ast: false});
+				instance.setupDefinitions(result, "webide");
+				// Required on packaged Lithp
+				instance.Define(result, "__AST__", Lithp.Types.Atom("true"))
+				try {
+					var timed = timeCall("Run code", () => instance.run(result));
+					console.log("Code run in " + timed[1] + "ms, result: " + timed[0]);
+				} catch (e) {
+					console.log(e.stack);
+				}
+				if(instance.Defined(result, "HTML_TOOLKIT") == Lithp.Types.Atom("true")) {
+					try {
+						instance.Invoke(result, "onReady/1", [document])
+					} catch (e) {
+						console.log(e.stack);
+					}
+				}
+				if(instance.Defined(result, "JQUERY_TOOLKIT") == Lithp.Types.Atom("true")) {
+					if(window.jQuery) {
+						console.log("Invoking jQuery behaviour");
+						window.jQuery.noConflict();
+						try {
+							instance.Invoke(result, "onJQuery/1", [window.jQuery])
+						} catch (e) {
+							console.log(e.stack);
+						}
+					}
+				}
+				flushCache();
+		}
+		</script>
+		<script src="lithp-pkg.js" type="text/javascript"></script>
+	</head>
+
+	<frameset cols="270,78%,20%">
+		<frame name="frame-palette" src="frame-palette.html" scrolling="no" />
+		<frameset rows="32,70%,*,32">
+			<frame name="frame-toolbar" src="frame-toolbar.html" scrolling="no" />
+			<frame name="frame-editor" src="frame-editor.html" />
+			<frame name="frame-output" src="frame-output.html" />
+			<frame name="frame-status" src="frame-status.html" scrolling="no" />
+		</frameset>
+		<frame name="frame-files" src="frame-files.html" scrolling="auto" />
+		<noframes>
+			<body>
+				<p>This page uses frames, but your browser doesn't support them.</p>
+			</body>
+		</noframes>
+	</frameset>
+</html>
