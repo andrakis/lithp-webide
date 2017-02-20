@@ -3,9 +3,11 @@
 (
 	(define 'HTML_TOOLKIT' true)
 	(var Document (atom nil))
-	(def onReady (scope #Doc :: (
+	(var Window   (atom nil))
+	(def onReady/* (scope #Doc,Window :: (
 		%(print "Document: " (inspect Doc))
 		(set Document (get Doc))
+		(set Window   (get Window))
 		%(print "Editor: " (inspect (getElementById "editor")))
 	)))
 

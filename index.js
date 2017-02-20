@@ -43,7 +43,7 @@ window.onload = function() {
 	if(instance.Defined(ideParsed, "HTML_TOOLKIT") == lithp.Types.Atom('true')) {
 		console.log("Invoking onReady behaviour");
 		try {
-			instance.Invoke(ideParsed, "onReady/1", [document]);
+			instance.Invoke(ideParsed, "onReady/*", [document, window]);
 		} catch (e) {
 			console.log(e.stack);
 		}

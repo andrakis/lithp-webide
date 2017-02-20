@@ -7,65 +7,11 @@
 		<script src="jquery-3.1.1.js" type="text/javascript"></script>
 		<script src="base64.js" type="text/javascript"></script>
 		<script src="types.js" type="text/javascript"></script>
-		<script type="text/javascript">
-			var oldConsole = console;
-			window.fakeConsole = {
-				stdout: "",
-				stderr: "",
-				logStdout: function() {
-					var out = Array.prototype.join.call(arguments, ' ');
-					if(out.length > 0) {
-						if(out.slice(-1) != "\n")
-							out += "\n";
-						fakeConsole.stdout += out;
-					}
-					if(fakeConsole.onStdout && fakeConsole.stdout.length > 0) {
-						fakeConsole.onStdout(fakeConsole.stdout);
-						fakeConsole.stdout = "";
-					}
-				},
-				logStderr: function() {
-					var out = Array.prototype.join.call(arguments, ' ');
-					if(out.length > 0) {
-						out = "STDERR: " + out;
-						if(out.slice(-1) != "\n")
-							out += "\n";
-						fakeConsole.stderr += out;
-					}
-					if(fakeConsole.onStderr && fakeConsole.stderr.length > 0) {
-						fakeConsole.onStderr(fakeConsole.stderr);
-						fakeConsole.stderr = "";
-					}
-				},
-				onStdout: null,
-				onStderr: null,
-				flush: function() {
-					window.fakeConsole.logStdout("");
-					window.fakeConsole.logStderr("");
-				}
-			};
-			window.console = {
-				oldConsoleStdout: true,
-				oldConsoleStderr: true,
-				log: function() {
-					if(window.console.oldConsoleStdout) {
-						oldConsole.log.apply(oldConsole , arguments);
-					}
-					fakeConsole.logStdout.apply(fakeConsole, arguments);
-				},
-				error: function() {
-					if(window.console.oldConsoleStderr) {
-						oldConsole.error.apply(oldConsole , arguments);
-					}
-					fakeConsole.logStderr.apply(fakeConsole, arguments);
-				},
-			};
-		</script>
+		<script type="text/javascript" src="fakeconsole.js"></script>
 		<script type="text/javascript">
 			console.log("Web IDE loading");
-			var toolbarSettings = {};
 			window.onmessage = function(msg) {
-				console.log("toplevel received: ", msg.data.type);
+				//console.log("toplevel received: ", msg.data.type);
 				var data = msg.data;
 				switch(data.type) {
 					case msgFrameReady:
@@ -75,10 +21,12 @@
 						window.frames["frame-editor"].postMessage(MsgGetEditorCode(), "*");
 						break;
 					case msgGotEditorCode:
-						runCode(data.code);
-						break;
 					case msgGotToolbarSettings:
-						toolbarSettings = data.settings;
+						window.frames["frame-status"].postMessage(data, "*");
+						break;
+					case msgClearConsole:
+					case msgFlushCache:
+						window.frames["frame-output"].postMessage(data, "*");
 						break;
 					case msgOutputFakeConsole:
 						switch(data.stream) {
@@ -170,6 +118,8 @@
 							window.frames["frame-editor"].postMessage(MsgSetEditorCode(code), "*");
 						}
 						window.frames["frame-editor"].postMessage(MsgStartUpdatePermalink(), "*");
+						break;
+					case "status":
 						break;
 					default:
 						console.log("Unknown frameReady: " + data.name);

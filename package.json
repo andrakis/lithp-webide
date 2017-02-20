@@ -1,10 +1,14 @@
 {
   "name": "lithp-webide",
-  "version": "0.0.1",
+  "version": "1.2.0",
   "description": "An web-based IDE for Lithp",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrakis/lithp-webide.git"
   },
   "keywords": [
     "lithp",
@@ -13,6 +17,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "lithp-pkg": "git+https://github.com/andrakis/lithp-pkg.git"
+    "lithp-pkg": "git+https://github.com/andrakis/lithp-pkg.git",
+    "stringify": "^5.1.0"
+  },
+  "stringify": {
+    "appliesTo": {
+      "includeExtensions": [
+        ".lithp"
+      ]
+    },
+    "minify": false
   }
 }

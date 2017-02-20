@@ -4,6 +4,114 @@
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
 <title>Untitled 1</title>
+<script type="text/javascript" src="types.js"></script>
+<script type="text/javascript" src="fakeconsole.js"></script>
+<script type="text/javascript">
+	console.oldConsoleStdout = false;
+	console.oldConsoleStderr = false;
+	var toolbarSettings = {};
+	window.onmessage = function(msg) {
+		var data = msg.data;
+		switch(data.type) {
+			case msgGotEditorCode:
+				runCode(data.code);
+				break;
+			case msgGotToolbarSettings:
+				toolbarSettings = data.settings;
+				console.log("(status) Got toolbar settings");
+				break;
+			default:
+				console.log("(status) Unknown message: " + data.type);
+				break;
+		}
+	};
+	var stdout_buffer = "";
+
+	window.parent.postMessage(MsgFrameReady('status'), '*');
+	fakeConsole.onStdout = function(content) {
+		if(content.length > 0) {
+			if(content.slice(-1) != "\n")
+				content += "\n";
+			stdout_buffer += content;
+			flushBufferStdout();
+		}
+	}
+	fakeConsole.onStderr = function(content) {
+		if(content.length > 0) {
+			if(content.slice(-1) != "\n")
+				content += "\n";
+			stdout_buffer += content;
+			flushBufferStdout();
+		}
+	}
+	fakeConsole.flush();
+	flushBufferStdout();
+	console.log("Status console activated");
+
+	function flushBufferStdout () {
+		if(stdout_buffer.length > 0) {
+			window.parent.postMessage(MsgOutputFakeConsole("stdout", stdout_buffer), "*");
+			stdout_buffer = "";
+		}
+	}
+	function clearConsole() {
+		window.parent.postMessage(MsgClearConsole(), "*");
+	}
+	
+	function flushCache() {
+		flushBufferStdout();
+		window.parent.postMessage(MsgFlushCache(), "*");
+	}
+
+	function runCode (code) {
+		var debugMode = toolbarSettings.debugMode;
+		var parserDebug=toolbarSettings.parserDebug;
+		var clearOnRun= toolbarSettings.clearOnRun;
+
+		if(clearOnRun) {
+			clearConsole();
+			setTimeout(runCodeImmediate, 2, code, debugMode, parserDebug);
+		} else {
+			runCodeImmediate(code, debugMode, parserDebug);
+		}
+	}
+	
+	function runCodeImmediate(code, debugMode, parserDebug) {
+		var instance = window.lithpInstance;
+		Lithp.set_debug_flag(debugMode);
+		global._lithp.set_parser_debug(parserDebug);
+		var result = Lithp.Parser(code, {finalize: true, ast: false});
+		instance.setupDefinitions(result, "webide");
+		// Required on packaged Lithp
+		instance.Define(result, "__AST__", Lithp.Types.Atom("true"))
+		try {
+			var timed = timeCall("Run code", () => instance.run(result));
+			console.log("Code run in " + timed[1] + "ms, result: " + timed[0]);
+		} catch (e) {
+			console.log(e.stack);
+		}
+		if(instance.Defined(result, "HTML_TOOLKIT") == Lithp.Types.Atom("true")) {
+			try {
+				instance.Invoke(result, "onReady/1", [document])
+			} catch (e) {
+				console.log(e.stack);
+			}
+		}
+		if(instance.Defined(result, "JQUERY_TOOLKIT") == Lithp.Types.Atom("true")) {
+			if(window.jQuery) {
+				console.log("Invoking jQuery behaviour");
+				window.jQuery.noConflict();
+				try {
+					instance.Invoke(result, "onJQuery/1", [window.jQuery])
+				} catch (e) {
+					console.log(e.stack);
+				}
+			}
+		}
+		flushCache();
+	}
+</script>
+<script type="text/javascript" src="lithp-pkg.js"></script>
 </head>
 
 <body style="margin:0; background-color:darkgray;">
