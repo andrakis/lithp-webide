@@ -12,9 +12,10 @@ window.Lithp = lithp;
 var util = require('util');
 window.util = util; // expose to HTML pages
 
-var files;
+var files, samples;
 try {
 	files = require('./files');
+	samples = require('./samples');
 } catch (e) {
 	console.error("Please run genfiles.sh");
 	return;
@@ -32,6 +33,7 @@ if(global._lithp === undefined)
 	global._lithp = {};
 global._lithp.browserify = true;
 global._lithp.fileCache = files;
+global._lithp.fileSampleCache = samples;
 
 var ideParsed = lithp.Parser(code, {ast: true, finalize: true});
 instance.setupDefinitions(ideParsed, "webide.ast")
