@@ -70,6 +70,10 @@
 
 			function updateNow () {
 				window.parent.postMessage(MsgFileUpdated(currentfile, editor.getValue()), "*");
+				// Also update permalink
+				if(currentfile == "unnamed.lithp") {
+					window.parent.postMessage(MsgStartUpdatePermalink(), "*");
+				}
 				updateTime = Date.now();
 				if(updateTimer) {
 					clearTimeout(updateTimer);
