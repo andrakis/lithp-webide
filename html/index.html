@@ -10,8 +10,19 @@
 		<script type="text/javascript" src="fakeconsole.js"></script>
 		<script type="text/javascript">
 			console.log("Web IDE loading");
+			var verbose = false;
+			var verboseMatch = location.search.match(/(?:\?|&)verbose=(.*?)(?:(&|$))/);
+			if(verboseMatch) {
+				switch(verboseMatch[1].toLowerCase()) {
+					case 'y': case 'yes':
+					case '1':
+						verbose = true;
+						break;
+				}
+			}
 			window.onmessage = function(msg) {
-				//console.log("toplevel received: ", msg.data.type);
+				if(verbose)
+					console.log("toplevel received: ", msg.data.type);
 				var data = msg.data;
 				switch(data.type) {
 					case msgFrameReady:
@@ -45,10 +56,16 @@
 						}
 						break;
 					case msgStartUpdatePermalink:
-						window.frames["frame-editor"].postMessage(MsgStartUpdatePermalink(), "*");
+						window.frames["frame-files"].postMessage(MsgStartUpdatePermalink(), "*");
 						break;
 					case msgGotUpdatePermalink:
 						window.frames["frame-toolbar"].postMessage(data, "*");
+						break;
+					case msgFileChanged:
+						window.frames["frame-editor"].postMessage(data, "*");
+						break;
+					case msgFileUpdated:
+						window.frames["frame-files"].postMessage(data, "*");
 						break;
 					default:
 						console.log("unknown message: " + data.type);
@@ -115,7 +132,7 @@
 						window.frames["frame-toolbar"].postMessage(MsgGetToolbarSettings(), "*");
 						break;
 					case "editor":
-						var codeMatch = location.search.match(/^\?code=(.*?)(?:(&|$))/);
+						var codeMatch = location.search.match(/(?:\?|&)code=(.*?)(?:(&|$))/);
 						if(codeMatch) {
 							var code = Base64.decode(codeMatch[1]);
 							window.frames["frame-editor"].postMessage(MsgSetEditorCode(code), "*");

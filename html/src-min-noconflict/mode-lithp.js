@@ -5,10 +5,13 @@ var oop = require("../lib/oop");
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
 var LispHighlightRules = function() {
-    var keywordControl = "if|while|def|get|set|recurse|next|else|var|import"
+    var keywordControl = "if|while|def|get|set|recurse|next|else|var|import|print|regex|list|" +
+                         "tuple|list|dict|scope|length|head|tail|call|invoke|atom|" +
+                         "get|set|var|==|++|+|@|and|or|>|<|>=|<=|-|/|index-set|dict-get|dict-set|" +
+                         "apply|export|export-global";
     var keywordOperator = "==|and|or|>|<|>=|<=|+|-|/"
-    var constantLanguage = "null|nil";
-    var supportFunctions = "regex|list|tuple|dict|prod|map|seq|scope|print|each"
+    var constantLanguage = "null|nil|true|false";
+    var supportFunctions = "prod|map|seq|each|permutations|sum|foldl|reverse|zip|switch|case|default";
 
     var keywordMapper = this.createKeywordMapper({
         "keyword.control": keywordControl,

@@ -27,7 +27,7 @@
 
 	<body>
 
-		<pre id="editor">% Sample: recurse
+		<pre id="editor" onChange="update()">% Sample: recurse
 %
 % Purpose: Demonstrate tail recursion via the recurse/* builtin.
 %
@@ -51,31 +51,48 @@
 		<script src="types.js" type="text/javascript"></script>
 		<script src="frame-shared.js" type="text/javascript"></script>
 		<script src="jquery-3.1.1.js" type="text/javascript"></script>
-		<script src="base64.js" type="text/javascript"></script>
 		<script type="text/javascript">
+			var currentfile = "unnamed.lithp";
 			var editor = ace.edit("editor");
 			editor.setTheme("ace/theme/idle_fingers");
 			editor.session.setMode("ace/mode/lithp");
-			/*if(codeMatch) {
-				// -1 moves cursor to start
-				editor.setValue(Base64.decode(codeMatch[1]), -1);
+			editor.session.on('change', function() { update(); });
+
+			// On editor update, send updates every 100 ms
+			var updateTimer = undefined, updateTime = 0;
+			function update () {
+				if(Date.now() - updateTime > 100) {
+					updateNow();
+				} else {
+					updateTimer = setTimeout(update, 100);
+				}
 			}
-			function updatePermalink () {
-				var code64 = Base64.encode(editor.getValue());
-				codePermalink.href = "?code=" + code64;
-			}*/
+
+			function updateNow () {
+				window.parent.postMessage(MsgFileUpdated(currentfile, editor.getValue()), "*");
+				updateTime = Date.now();
+				if(updateTimer) {
+					clearTimeout(updateTimer);
+					updateTimer = undefined;
+				}
+			}
+
 			window.onmessage = function(msg) {
 				var data = msg.data;
 				switch(data.type) {
 					case msgGetEditorCode:
 						window.parent.postMessage(MsgGotEditorCode(editor.getValue()), "*");
 						break;
+					case msgFileChanged:
+						updateNow(); // sync
+						currentfile = data.name;
+						editor.setValue(data.content, -1);
+						break;
 					case msgSetEditorCode:
+						updateNow(); // sync
+						currentfile = "unnamed.lithp";
 						editor.setValue(data.code, -1);
 						break;
-					case msgStartUpdatePermalink:
-						var link = Base64.encode(editor.getValue());
-						window.parent.postMessage(MsgGotUpdatePermalink(link), "*");
 					default:
 						console.log("(editor) unknown message: " + data.type);
 						break;

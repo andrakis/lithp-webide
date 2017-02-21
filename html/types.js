@@ -16,6 +16,9 @@ var msgFlushCache = 'flushCache';
 var msgStartUpdatePermalink = "startUpdatePermalink";
 var msgGotUpdatePermalink = "gotUpdatePermalink";
 
+var msgFileUpdated = "fileUpdated";
+var msgFileChanged = "fileChanged";
+
 function MsgFrameReady (name) {
 	return {'type': msgFrameReady, 'name': name};
 }
@@ -71,3 +74,12 @@ function MsgStartUpdatePermalink () {
 function MsgGotUpdatePermalink (link) {
 	return {'type': msgGotUpdatePermalink, 'link': link};
 }
+
+function MsgFileUpdated(name, content) {
+	return {'type': msgFileUpdated, 'name': name, 'content': content};
+};
+
+function MsgFileChanged(name, content) {
+	return {'type': msgFileChanged, 'name': name, 'content': content};
+}
+
