@@ -7,9 +7,11 @@
 	(var Document (atom nil))
 	(var Window   (atom nil))
 	(var HtmlToolkitOnReady (list))
+	(var Ready false)
 	(def onReady/* (scope #Values :: (
 		(set Document (index Values 0))
 		(set Window   (index Values 1))
+		(set Ready true)
 		(each HtmlToolkitOnReady #Callback :: (
 			(call Callback)
 		))
@@ -18,9 +20,13 @@
 	(export-global onReady/*)
 
 	(def htmlOnLoad (scope #Callback :: (
-		(set HtmlToolkitOnReady (++
-			 HtmlToolkitOnReady (list Callback)
-		))
+		(if (== false Ready) (
+			(set HtmlToolkitOnReady (++
+				 HtmlToolkitOnReady (list Callback)
+			))
+		) (else (
+			(call Callback)
+		)))
 		(atom ok)
 	)))
 
