@@ -11,7 +11,7 @@
 	% Called by the JavaScript editor when code is run
 	(def onJQuery (scope #JQ :: (
 		(set JQueryJSObj (get JQ))
-		(map JQueryOnLoadCallbacks #CB :: (
+		(each JQueryOnLoadCallbacks #CB :: (
 			(call CB)
 		))
 	)))

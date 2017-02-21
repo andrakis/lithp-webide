@@ -92,7 +92,7 @@
 		}
 		if(instance.Defined(result, "HTML_TOOLKIT") == Lithp.Types.Atom("true")) {
 			try {
-				instance.Invoke(result, "onReady/1", [document])
+				instance.Invoke(result, "onReady/*", [document, window]);
 			} catch (e) {
 				console.log(e.stack);
 			}

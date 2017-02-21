@@ -2,18 +2,40 @@
 % You must invoke onReady/1 with the "body" element.
 (
 	(define 'HTML_TOOLKIT' true)
+	(import lists)
+
 	(var Document (atom nil))
 	(var Window   (atom nil))
-	(def onReady/* (scope #Doc,Window :: (
-		%(print "Document: " (inspect Doc))
-		(set Document (get Doc))
-		(set Window   (get Window))
-		%(print "Editor: " (inspect (getElementById "editor")))
+	(var HtmlToolkitOnReady (list))
+	(def onReady/* (scope #Values :: (
+		(set Document (index Values 0))
+		(set Window   (index Values 1))
+		(each HtmlToolkitOnReady #Callback :: (
+			(call Callback)
+		))
 	)))
+
+	(export-global onReady/*)
+
+	(def htmlOnLoad (scope #Callback :: (
+		(set HtmlToolkitOnReady (++
+			 HtmlToolkitOnReady (list Callback)
+		))
+		(atom ok)
+	)))
+
+	(export-global htmlOnLoad/1)
 
 	(def getElementById (scope #Id :: (
 		(doc-apply getElementById (list Id))
 	)))
+
+	(def prompt (scope #Question,Callback :: (
+		(var Result (invoke Window prompt Question))
+		(call Callback Result)
+	)))
+
+	(export-global prompt/2)
 
 	(def doc-apply (scope #Member,Args :: (
 		(js-apply Document (dict-get Document Member) Args)
@@ -21,6 +43,4 @@
 
 	(def getDoc (scope # :: ((Document))))
 	(export-global getDoc/0)
-
-	(export-global onReady/1)
 )

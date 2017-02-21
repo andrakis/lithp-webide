@@ -20,6 +20,9 @@
 					case msgRunCode:
 						window.frames["frame-editor"].postMessage(MsgGetEditorCode(), "*");
 						break;
+					case msgSetEditorCode:
+						window.frames["frame-editor"].postMessage(data, "*");
+						break;
 					case msgGotEditorCode:
 					case msgGotToolbarSettings:
 						window.frames["frame-status"].postMessage(data, "*");

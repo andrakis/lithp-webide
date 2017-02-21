@@ -39,6 +39,7 @@ var ideParsed = lithp.Parser(code, {ast: true, finalize: true});
 instance.setupDefinitions(ideParsed, "webide.ast")
 instance.Define(ideParsed, "__AST__", lithp.Types.Atom('true'));
 instance.Define(ideParsed, "RUNTIME", "browser");
+global._lithp.host = "browser";
 instance.run(ideParsed);
 
 window.onload = function() {
