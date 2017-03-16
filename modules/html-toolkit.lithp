@@ -49,4 +49,13 @@
 
 	(def getDoc (scope # :: ((Document))))
 	(export-global getDoc/0)
+
+	(def getWindow (scope # :: ((Window))))
+	(export-global getWindow/0)
+
+	(def postParentMessage #Message :: (
+		(var Window (getWindow))
+		(js-apply Window (dict-get Window "LithpPostMessage") (list Message))
+	))
+	(export-global postParentMessage/1)
 )

@@ -4,7 +4,7 @@
 	<head>
 		<meta content="en-us" http-equiv="Content-Language" />
 		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-		<title>This is the editor</title>
+		<title>Editor Frame</title>
 		<style type="text/css" media="screen">
 		body {
 			overflow: hidden;
@@ -54,6 +54,7 @@
 		<script type="text/javascript">
 			var currentfile = "unnamed.lithp";
 			var editor = ace.edit("editor");
+			var updatePermalinkTimeout = 200;
 			editor.setTheme("ace/theme/idle_fingers");
 			editor.session.setMode("ace/mode/lithp");
 			editor.session.on('change', function() { update(); });
@@ -61,10 +62,10 @@
 			// On editor update, send updates every 100 ms
 			var updateTimer = undefined, updateTime = 0;
 			function update () {
-				if(Date.now() - updateTime > 100) {
+				if(Date.now() - updateTime > updatePermalinkTimeout) {
 					updateNow();
 				} else {
-					updateTimer = setTimeout(update, 100);
+					updateTimer = setTimeout(update, updatePermalinkTimeout);
 				}
 			}
 
@@ -97,12 +98,27 @@
 						currentfile = "unnamed.lithp";
 						editor.setValue(data.code, -1);
 						break;
+					case msgSetEditorState:
+						switch(data.stateName) {
+							case msgEditorStateKeybindings:
+								editor.setKeyboardHandler(data.stateValue);
+								console.log("Updated keyboard handler to: " + (data.stateValue || "Ace"));
+								break;
+							default:
+								console.log("Unknown SetEditorStat(" + data.stateName + ")");
+								break;
+						}
+						break;
+					case msgStartUpdatePermalink:
+						updateNow();
+						break;
 					default:
 						console.log("(editor) unknown message: " + data.type);
 						break;
 				}
 			}
-			$(function() {
+			jQuery.noConflict();
+			jQuery(function() {
 				window.parent.postMessage(MsgFrameReady("editor"), "*");
 			});
 		</script>

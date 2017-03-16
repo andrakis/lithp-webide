@@ -79,6 +79,7 @@
 			case msgStartUpdatePermalink:
 				var link = Base64.encode(files["unnamed.lithp"]);
 				window.parent.postMessage(MsgGotUpdatePermalink(link), "*");
+				break;
 			default:
 				console.log("(files) unknown message: " + data.type);
 				break;

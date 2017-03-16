@@ -19,6 +19,11 @@ var msgGotUpdatePermalink = "gotUpdatePermalink";
 var msgFileUpdated = "fileUpdated";
 var msgFileChanged = "fileChanged";
 
+var msgStartPaletteHandler = "msgStartPaletteHandler";
+
+var msgSetEditorState = "msgSetEditorState";
+var msgEditorStateKeybindings = "msgEditorStateKeybindings";
+
 function MsgFrameReady (name) {
 	return {'type': msgFrameReady, 'name': name};
 }
@@ -83,3 +88,10 @@ function MsgFileChanged(name, content) {
 	return {'type': msgFileChanged, 'name': name, 'content': content};
 }
 
+function MsgStartPaletteHandler() {
+	return {'type': msgStartPaletteHandler};
+}
+
+function MsgSetEditorState(stateName, stateValue) {
+	return {'type': msgSetEditorState, 'stateName': stateName, 'stateValue': stateValue};
+}

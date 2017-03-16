@@ -64,11 +64,14 @@
 		(tuple append #Self,Obj :: (
 		    (member-call Self call append (list (unclass Obj)))
 		))
+		(tuple bind #Self,Event,Handler :: (
+			(member-call Self call bind (list Event (js-bridge Handler)))
+		))
 		(tuple getCss #Self :: (
-			(member-call Self call css (list))
+			(member-call Self invoke css (list))
 		))
 		(tuple getValue #Self :: (
-			(member-call Self call val (list))
+			(member-call Self invoke val (list))
 		))
 		(tuple remove #Self :: (
 			(member-call Self call remove (list))

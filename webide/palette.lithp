@@ -1,0 +1,27 @@
+% Web IDE 2 module: Palette
+%
+% Handles the editor palette sidebar.
+%
+(
+	(import html-toolkit)
+	(import jquery-toolkit)
+
+	(def msgEditorStateKeybindings # :: (("msgEditorStateKeybindings")))
+	(def msgSetEditorState #StateName,StateValue :: (
+		(dict
+			(tuple type "msgSetEditorState")
+			(tuple stateName StateName)
+			(tuple stateValue StateValue)
+		)
+	))
+	(export-global msgSetEditorState/2 msgEditorStateKeybindings/0)
+
+	(jqueryOnLoad # :: (
+		(print "Palette: registering behaviours")
+		(var WidgetKeybinding (jQuery "select#keybinding"))
+		(member-call WidgetKeybinding bind "change" (scope # :: (
+			(var Value (member-call WidgetKeybinding getValue))
+			(postParentMessage (msgSetEditorState (msgEditorStateKeybindings) Value))
+		)))
+	))
+)

@@ -21,11 +21,15 @@
 				}
 			}
 			window.onmessage = function(msg) {
-				if(verbose)
-					console.log("toplevel received: ", msg.data.type);
+				var debug = "";
+				if(verbose) {
+					debug = "toplevel received: ";
+					debug += msg.data.type;
+				}
 				var data = msg.data;
 				switch(data.type) {
 					case msgFrameReady:
+						debug += ", name: " + msg.data.name;
 						frameReady(data);
 						break;
 					case msgRunCode:
@@ -54,6 +58,7 @@
 								console.log("unknown stream: " + data.stream);
 								break;
 						}
+						debug += ", stream: " + data.stream + ", content: " + data.content;
 						break;
 					case msgStartUpdatePermalink:
 						window.frames["frame-files"].postMessage(MsgStartUpdatePermalink(), "*");
@@ -62,6 +67,7 @@
 						window.frames["frame-toolbar"].postMessage(data, "*");
 						break;
 					case msgFileChanged:
+					case msgSetEditorState:
 						window.frames["frame-editor"].postMessage(data, "*");
 						break;
 					case msgFileUpdated:
@@ -71,6 +77,8 @@
 						console.log("unknown message: " + data.type);
 						break;
 				}
+				if(verbose)
+					console.log(debug);
 			}
 
 			var stdout_buffer = "", stdout_last = 0, stdout_timer = undefined;
@@ -139,7 +147,12 @@
 						}
 						window.frames["frame-editor"].postMessage(MsgStartUpdatePermalink(), "*");
 						break;
+					case "palette":
+						window.frames["frame-palette"].postMessage(MsgStartPaletteHandler(), "*");
+						break;
+					// Do nothing for these frames
 					case "status":
+					case "files":
 						break;
 					default:
 						console.log("Unknown frameReady: " + data.name);

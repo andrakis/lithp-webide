@@ -3,7 +3,7 @@
 
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-<title>Untitled 1</title>
+<title>Status Frame</title>
 <script type="text/javascript" src="types.js"></script>
 <script type="text/javascript" src="fakeconsole.js"></script>
 <script type="text/javascript">
@@ -114,9 +114,16 @@
 <script type="text/javascript" src="lithp-pkg.js"></script>
 </head>
 
-<body style="margin:0; background-color:darkgray;">
-  <!-- TODO: read version from webide's package.json, also print Lithp version -->
-  <p style="margin-top: 0;">Lithp Web IDE [Version 0.5.2], using ACE Editor</p>
-</body>
+	<body style="margin:0; background-color:darkgray;">
+		<p id="version" style="margin-top: 0;">Lithp Web IDE, using ACE Editor</p>
+		<script type="text/javascript">
+			var lithpPackage = global._lithp.fileCache['package.ast'];
+			var WebIDEPackage= global._lithp.fileCache['webide/package.ast'];
+			var target = document.getElementById('version');
+			target.innerHTML = "Lithp Web IDE [" + WebIDEPackage.version + "] " +
+			                   "(<a href='https://github.com/andrakis/node-lithp'>Lithp v" + lithpPackage.version + "</a>), " +
+			                   "using <a href='https://ace.c9.io'>ACE Editor</a>";
+		</script>
+	</body>
 
 </html>
