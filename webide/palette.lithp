@@ -6,6 +6,7 @@
 	(import html-toolkit)
 	(import jquery-toolkit)
 
+	% These structures are the same as in ../html/types.js
 	(def msgEditorStateKeybindings # :: (("msgEditorStateKeybindings")))
 	(def msgSetEditorState #StateName,StateValue :: (
 		(dict
@@ -16,12 +17,19 @@
 	))
 	(export-global msgSetEditorState/2 msgEditorStateKeybindings/0)
 
+	% $(function () {
 	(jqueryOnLoad # :: (
 		(print "Palette: registering behaviours")
+		% Grab the keybinding element by id (looks just like jQuery in Javascript!)
 		(var WidgetKeybinding (jQuery "select#keybinding"))
+		% Assign a handler to the "change" event. Essentially, WidgetKeybinding.bind("change", function() { ... })
 		(member-call WidgetKeybinding bind "change" (scope # :: (
+			% Get the value of the widget, ie WidgetKeybinding.val()
+			% Note that the jQuery interface in Lithp provides getValue() and setValue() instead of val(...)
 			(var Value (member-call WidgetKeybinding getValue))
+			% Provided by HTML-toolkit, allows passing a message to the parent frame, index.html.
 			(postParentMessage (msgSetEditorState (msgEditorStateKeybindings) Value))
 		)))
 	))
+	% }
 )
