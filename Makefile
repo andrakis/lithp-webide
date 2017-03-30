@@ -37,10 +37,12 @@ webide:
 	$(MAKE) -C webide
 
 update: clean
+	rm -rf node_modules/lithp ||:
+	rm lithp ||:
 	npm update
 
 clean:
-	rm -f lithp-pkg.js
+	rm -f lithp-pkg.js ||:
 	$(MAKE) -C node_modules/lithp-pkg clean
 	$(MAKE) -C modules clean
 	$(MAKE) -C webide clean
