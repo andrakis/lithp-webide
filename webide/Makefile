@@ -14,6 +14,7 @@ FINAL=
 	$(eval FINAL += $<)
 
 final:
+	ln -s ../package.json package.ast ||:
 	@if [ "$(FINAL)"x != "x" ]; then $(RUN) $(RUNFLAGS) -c $(FINAL); fi
 
 clean:
